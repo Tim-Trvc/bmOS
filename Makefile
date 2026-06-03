@@ -37,7 +37,7 @@ build/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 flash: all
-	st-flash write build/$(APP).bin 0x08000000
+	st-flash --reset write build/$(APP).bin 0x08000000
 
 clean:
 	rm -rf build/*
