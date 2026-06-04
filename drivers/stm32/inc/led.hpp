@@ -6,22 +6,21 @@
 namespace Drivers {
 
 class Led {
-public:
+ public:
   static void init() {
     REG32(RCC_AHB1ENR) |= (1 << 0);
     REG32(GPIOA_MODER) &= ~(1 << 11);
     REG32(GPIOA_MODER) |= (1 << 10);
   }
 
-  static void toggle() {
-    REG32(GPIOA_ODR) ^= (1 << 5);
-  }
+  static void toggle() { REG32(GPIOA_ODR) ^= (1 << 5); }
 
   static void delay(int iterations) {
-    for (volatile int i=0; i<iterations; i = i + 1) {}
+    for (volatile int i = 0; i < iterations; i = i + 1) {
+    }
   }
 
-private:
+ private:
   static constexpr uint32_t RCC_BASE = 0x40023800;
   static constexpr uint32_t GPIOA_BASE = 0x40020000;
 
@@ -30,4 +29,4 @@ private:
   static constexpr uint32_t GPIOA_ODR = (GPIOA_BASE + 0x14);
 };
 
-} // namespace Drivers
+}  // namespace Drivers
