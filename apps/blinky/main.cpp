@@ -1,38 +1,35 @@
 #include <stdint.h>
 
+#include "button.hpp"
+#include "coroutine.hpp"
 #include "led.hpp"
-#include "systick.hpp"
+#include "task.hpp"
 
-class BlinkyTask {
- public:
-  void run(uint32_t current_tick) {
-    if (!is_initialized) {
-      Drivers::Led::init();
-      is_initialized = true;
-    }
-
-    if (current_tick - last_action_tick >= wait_ticks) {
-      Drivers::Led::toggle();
-      last_action_tick = current_tick;
-    }
+Kernel::Task blinky_coro() {
+  Drivers::Led::init();
+  while (true) {
+    Drivers::Led::toggle();
+    co_await std::suspend_always{};
   }
+}
 
- private:
-  bool is_initialized = false;
-  uint32_t last_action_tick = 0;
-  uint32_t wait_ticks = 500;
-};
+Kernel::Task button_coro() {
+  Drivers::Button::init();
+  while (true) {
+    co_await std::suspend_always{};
+  }
+}
 
 volatile uint32_t system_tick = 0;
 
-extern "C" void SysTick_Handler(void) { system_tick += 1; }
+extern "C" void SysTick_Handler(void) { system_tick = system_tick + 1; }
 
 int main() {
-  BlinkyTask blinky;
-
-  Drivers::SysTick::init();
+  Kernel::Task blinky_task = blinky_coro();
+  Kernel::Task button_task = button_coro();
 
   while (true) {
-    blinky.run(system_tick);
+    blinky_task.handle.resume();
+    button_task.handle.resume();
   }
 }

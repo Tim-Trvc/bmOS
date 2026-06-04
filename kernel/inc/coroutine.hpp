@@ -11,6 +11,17 @@ struct coroutine_handle<void> {
 
   void resume() { __builtin_coro_resume(ptr); }
   void done() const { __builtin_coro_done(ptr); }
+
+  void destroy() { __builtin_coro_destroy(ptr); }
+
+  explicit operator bool() const { return ptr != nullptr; }
+
+  void* address() const { return ptr; }
+  static coroutine_handle from_address(void* addr) {
+    coroutine_handle h;
+    h.ptr = addr;
+    return h;
+  }
 };
 
 template <typename Promise>
@@ -20,6 +31,23 @@ struct coroutine_handle : coroutine_handle<void> {
     h.ptr = __builtin_coro_promise(&p, alignof(Promise), false);
     return h;
   }
+
+  static coroutine_handle from_address(void* addr) {
+    coroutine_handle h;
+    h.ptr = addr;
+    return h;
+  }
+
+  Promise& promise() const {
+    void* promise_ptr =
+        __builtin_coro_promise(this->ptr, alignof(Promise), true);
+    return *static_cast<Promise*>(promise_ptr);
+  }
+};
+
+template <typename R, typename... Args>
+struct coroutine_traits {
+  using promise_type = typename R::promise_type;
 };
 
 struct suspend_always {
