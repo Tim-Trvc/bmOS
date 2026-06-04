@@ -10,7 +10,7 @@ struct coroutine_handle<void> {
   void* ptr{nullptr};
 
   void resume() { __builtin_coro_resume(ptr); }
-  void done() const { __builtin_coro_done(ptr); }
+  bool done() const { return __builtin_coro_done(ptr); }
 
   void destroy() { __builtin_coro_destroy(ptr); }
 
@@ -28,7 +28,7 @@ template <typename Promise>
 struct coroutine_handle : coroutine_handle<void> {
   static coroutine_handle from_promise(Promise& p) {
     coroutine_handle h;
-    h.ptr = __builtin_coro_promise(&p, alignof(Promise), false);
+    h.ptr = __builtin_coro_promise(&p, alignof(Promise), true);
     return h;
   }
 
@@ -40,7 +40,7 @@ struct coroutine_handle : coroutine_handle<void> {
 
   Promise& promise() const {
     void* promise_ptr =
-        __builtin_coro_promise(this->ptr, alignof(Promise), true);
+        __builtin_coro_promise(this->ptr, alignof(Promise), false);
     return *static_cast<Promise*>(promise_ptr);
   }
 };

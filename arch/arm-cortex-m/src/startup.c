@@ -6,6 +6,7 @@ extern uint32_t _sbss, _ebss;
 
 extern int main(void);
 extern void SysTick_Handler(void);
+extern void HardFault_Handler(void);
 
 void Default_Handler(void) {
   while (1) {
@@ -32,7 +33,7 @@ __attribute__((section(".isr_vector"))) void (*const vector_table[])(void) = {
     (void (*)(void))(&_estack),  // start adress of stack
     Reset_Handler,               // Reset (on startup)
     Default_Handler,             // NMI
-    Default_Handler,             // HardFault
+    HardFault_Handler,           // HardFault
     Default_Handler,             // MemManage
     Default_Handler,             // BusFault
     Default_Handler,             // UsageFault

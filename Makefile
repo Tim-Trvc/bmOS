@@ -5,7 +5,7 @@ CXX = arm-none-eabi-g++
 CC = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 
-COMMON_FLAGS = -mcpu=cortex-m4 -mthumb -ffreestanding -Wall -Wextra -O0 -g
+COMMON_FLAGS = -mcpu=cortex-m4 -mthumb -ffreestanding -Wall -Wextra -Os -g
 COMMON_FLAGS += -I kernel/inc -I arch/arm-cortex-m/inc -I drivers/stm32/inc
 
 CFLAGS = $(COMMON_FLAGS)
