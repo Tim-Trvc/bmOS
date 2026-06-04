@@ -9,7 +9,7 @@ class SysTick {
 public:
   static void init() {
     REG32(SYSTICK_RVR) = 16000 - 1;
-    REG32(SYSTICK_CVR) &= 0;
+    REG32(SYSTICK_CVR) = 0;
     REG32(SYSTICK_CSR) |= (1 << 0) | (1 << 1) | (1 << 2);
 
   }

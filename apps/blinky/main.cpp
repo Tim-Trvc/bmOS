@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "led.hpp"
+#include "systick.hpp"
 
 class BlinkyTask {
 public:
@@ -19,17 +20,21 @@ public:
 private:
   bool is_initialized = false;
   uint32_t last_action_tick = 0;
-  uint32_t wait_ticks = 10000;
+  uint32_t wait_ticks = 500;
 };
 
+volatile uint32_t system_tick = 0;
+
+extern "C" void SysTick_Handler(void) {
+  system_tick += 1;
+}
 
 int main() {
   BlinkyTask blinky;
 
-  uint32_t system_tick = 0;
+  Drivers::SysTick::init();
 
   while (true) {
     blinky.run(system_tick);
-    system_tick = system_tick + 1;
   }
 }
