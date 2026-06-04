@@ -43,4 +43,19 @@ class Task {
   }
 };
 
+struct sleep_for {
+  uint32_t duration_ms;
+  sleep_for(uint32_t ms) : duration_ms(ms) {}
+
+  bool await_ready() const noexcept { return false; }
+
+  template <typename PromiseType>
+  void await_suspend(std::coroutine_handle<PromiseType> handle) const noexcept {
+    extern volatile uint32_t system_tick;
+    handle.promise().wake_up_tick = system_tick + duration_ms;
+  }
+
+  void await_resume() const noexcept {}
+};
+
 }  // namespace Kernel
